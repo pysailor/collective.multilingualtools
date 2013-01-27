@@ -1,0 +1,22 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:five="http://namespaces.zope.org/five"
+    i18n_domain="collective.multilingualtools">
+
+
+    <browser:page
+        for="plone.multilingual.interfaces.ITranslatable"
+        name="multilingualtools"
+        class=".multilingualtools.MultilingualToolsView"
+        permission="cmf.ModifyPortalContent"
+        layer="collective.multilingualtools.interfaces.IMultilingualToolsLayer"
+        allowed_interface="collective.multilingualtools.interfaces.IMultilingualForm"
+        />
+
+
+    <adapter factory=".layout.multilingualtools_layout " />
+
+
+</configure>
+
