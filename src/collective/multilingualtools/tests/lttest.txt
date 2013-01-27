@@ -1,7 +1,7 @@
-Lingua Tools basic tests
-========================
+MultilingualTools basic tests
+=============================
 
-This is a functional test for the user interface of slc.linguatools.
+This is a functional test for the user interface of collective.multilingualtools.
 
 Setup
 _____
@@ -12,14 +12,10 @@ First we have to set up some things and login.
     >>> app = layer['app']
     >>> from plone.testing.z2 import Browser
     >>> browser = Browser(app)
+    >>> browser.handleErrors = False
     >>> browser.addHeader('Authorization', 'Basic admin:secret')
     >>> portal = layer['portal']
     >>> portal_url = 'http://nohost/plone'
-
-By default, only HTTP error codes (e.g. 500 Server Side Error) are shown when an
-error occurs on the server. To see more details, set handleErrors to False:
-
-    >>> browser.handleErrors = False
 
 Make sure the site encoding is utf-8::
 

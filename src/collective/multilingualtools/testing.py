@@ -9,7 +9,7 @@ from plone.app.testing import FunctionalTesting
 from zope.configuration import xmlconfig
 
 
-class PloneAppDiscussion(PloneSandboxLayer):
+class MultilingualtoolsLayer(PloneSandboxLayer):
 
     defaultBases = (PLONE_FIXTURE,)
 
@@ -18,14 +18,14 @@ class PloneAppDiscussion(PloneSandboxLayer):
 
     def setUpZope(self, app, configurationContext):
         # Load ZCML
-        import slc.linguatools
+        import collective.multilingualtools
         xmlconfig.file('configure.zcml',
-                       slc.linguatools,
+                       collective.multilingualtools,
                        context=configurationContext)
 
     def setUpPloneSite(self, portal):
         # Install into Plone site using portal_setup
-        applyProfile(portal, 'slc.linguatools:default')
+        applyProfile(portal, 'collective.multilingualtools:default')
 
         # Creates some users
         acl_users = getToolByName(portal, 'acl_users')
@@ -36,10 +36,8 @@ class PloneAppDiscussion(PloneSandboxLayer):
             [],
         )
 
-SLC_LINGUATOOLS_FIXTURE = PloneAppDiscussion()
-SLC_LINGUATOOLS_INTEGRATION_TESTING = IntegrationTesting(
-    bases=(SLC_LINGUATOOLS_FIXTURE,),
-    name="SlcLinguatools:Integration")
-SLC_LINGUATOOLS_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(SLC_LINGUATOOLS_FIXTURE,),
-    name="SlcLinguatools:Functional")
+TEST_FIXTURE = MultilingualtoolsLayer()
+MULTILINGUALTOOLS_INTEGRATION_TESTING = IntegrationTesting(
+    bases=(TEST_FIXTURE,),
+    name="CollectiveMultilingualtools:Integration")
+
