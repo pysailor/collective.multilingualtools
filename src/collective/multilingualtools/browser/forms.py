@@ -18,7 +18,6 @@ from Products.CMFPlone import PloneMessageFactory as _
 from Products.statusmessages.interfaces import IStatusMessage
 
 from collective.multilingualtools import utils
-from collective.multilingualtools import ISubtyper
 
 log = logging.getLogger('collective.mutlilingualtools')
 
@@ -286,51 +285,6 @@ class PortletForm(FormMixin, form.Form):
         return ls
 
 
-class SubtypesForm(FormMixin, form.Form):
-    """ """
-    display = ISubtyper is not None
-    label = u"Subtypes"
-    ignoreContext = True
-    fields = field.Fields(interfaces.ISubtyperSchema).select(
-                                                'subtype',
-                                                )
-
-    buttons = button.Buttons(interfaces.ISubtyperSchema).select(
-                                                'add_subtype',
-                                                'remove_subtype',
-                                                )
-
-    @button.handler(interfaces.ISubtyperSchema['add_subtype'])
-    def add_subtype(self, action):
-        """ sets ob to given subtype """
-        status = IStatusMessage(self.request)
-        context = Acquisition.aq_inner(self.context)
-        data, error = self.extractData()
-        subtype = data.get('subtype')
-        status.addStatusMessage(u'Subtype object to %s' % subtype, type='info')
-        info, warnings, errors = utils.exec_for_all_langs(
-                                                context,
-                                                utils.add_subtype,
-                                                subtype=subtype,
-                                                )
-
-        self.handle_status(status, info, warnings, errors)
-
-    @button.handler(interfaces.ISubtyperSchema['remove_subtype'])
-    def remove_subtype(self, action):
-        """ sets ob to given subtype """
-        status = IStatusMessage(self.request)
-        context = Acquisition.aq_inner(self.context)
-        status.addStatusMessage(u'Remove subtype', type='info')
-
-        info, warnings, errors = utils.exec_for_all_langs(
-                                                context,
-                                                utils.remove_subtype,
-                                                )
-
-        self.handle_status(status, info, warnings, errors)
-
-
 class ReindexForm(FormMixin, form.Form):
     """ """
     label = u"Reindex"
@@ -444,7 +398,7 @@ class DeleterForm(FormMixin, form.Form):
 
     @button.handler(interfaces.IObjectHandlingSchema['delete'])
     def delete(self, action):
-        """ sets ob to given subtype """
+        """ deletes object in all languages """
         status = IStatusMessage(self.request)
         context = Acquisition.aq_inner(self.context)
         data, error = self.extractData()

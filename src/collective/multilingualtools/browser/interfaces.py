@@ -108,22 +108,6 @@ class IPortletSchema(interface.Interface):
     )
 
 
-class ISubtyperSchema(interface.Interface):
-    """ Subtyper Schema for the edit form. """
-
-    add_subtype = button.Button(title=u'Add Subtype')
-    remove_subtype = button.Button(title=u'Remove Subtype')
-
-    subtype = schema.Choice(
-        title=_("title_subtype", default=u"Available Subtypes"),
-        description=_(
-            "description_subtype", default=u"Add or remove the selected "
-            u"subtype on all translations."),
-        required=False,
-        vocabulary="collective.multilingualtools.vocabularies.subtypes",
-    )
-
-
 class IReindexSchema(interface.Interface):
     """ Schema for the Reindex All form. """
     reindex_all = button.Button(title=u'Reindex all')

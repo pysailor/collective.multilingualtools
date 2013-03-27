@@ -27,7 +27,6 @@ class MultilingualToolsView(FormWrapper):
             forms.DeleterForm,
             forms.ReindexForm,
             forms.WokflowForm,
-            forms.SubtypesForm,
             forms.PropertyForm,
             forms.MarkerInterfaceForm,
             forms.DuplicaterForm,

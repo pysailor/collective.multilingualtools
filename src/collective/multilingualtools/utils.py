@@ -27,7 +27,6 @@ from plone.multilingual.interfaces import (
 from Products.CMFCore.utils import getToolByName
 # from zope.app.publisher.interfaces.browser import IBrowserMenu
 from Products.Archetypes.interfaces.base import IBaseFolder
-from collective.multilingualtools import ISubtyper
 
 log = logging.getLogger('collective.multilingualtools')
 
@@ -201,45 +200,6 @@ def set_po_description(ob, *args, **kw):
     ob.setDescription(text)
 
 
-# def can_subtype():
-#     return not ISubtyper is None
-#
-#
-# def add_subtype(ob, *args, **kw):
-#     """ sets ob to given subtype """
-#     err = list()
-#     subtype = kw['subtype']
-#     if not can_subtype():
-#         err.append('Subtyper is not installed')
-#     if not subtype:
-#         err.append('Please select a subtype')
-#     if not err:
-#         subtyperUtil = zope.component.getUtility(ISubtyper)
-#         if subtyperUtil.existing_type(ob) is None:
-#             subtyperUtil.change_type(ob, subtype)
-#             ob.reindexObject()
-#         else:
-#             err.append(u'The object at %s is already subtyped to %s' \
-#                 % ('/'.join(ob.getPhysicalPath()),
-#                     subtyperUtil.existing_type(ob).descriptor.title))
-#     return err
-
-
-def remove_subtype(ob, *args, **kw):
-    err = list()
-    if not can_subtype():
-        err.append('Subtyper is not installed')
-    else:
-        subtyperUtil = zope.component.getUtility(ISubtyper)
-        if subtyperUtil.existing_type(ob) is not None:
-            subtyperUtil.remove_type(ob)
-            ob.reindexObject()
-        else:
-            err.append('The object at %s is not subtyped' \
-                % '/'.join(ob.getPhysicalPath()))
-    return err
-
-
 def workflow_action(ob, *args, **kw):
     """ Changes the object's workflow state
     """
@@ -384,15 +344,6 @@ def cut_and_paste(ob, *args, **kw):
             'Error message: %s' % (lang, target.absolute_url(), error))
 
     return err
-
-
-# def get_available_subtypes(context):
-#     """ Returns the subtypes available in this context
-#     """
-#     request = context.request
-#     subtypes_menu = zope.component.queryUtility(IBrowserMenu, 'subtypes')
-#     if subtypes_menu:
-#         return subtypes_menu._get_menus(context, request)
 
 
 def delete_this(ob, *args, **kw):
