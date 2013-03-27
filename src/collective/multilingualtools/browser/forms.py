@@ -14,7 +14,7 @@ from plone.multilingual.interfaces import ITranslationManager
 from plone.app.portlets.utils import assignment_mapping_from_key
 
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone import PloneMessageFactory as _
+from collective.multilingualtools import _
 from Products.statusmessages.interfaces import IStatusMessage
 
 from collective.multilingualtools import utils
@@ -58,15 +58,11 @@ class NamingForm(FormMixin, form.Form):
     """ """
     label = u"Naming"
     ignoreContext = True
-    fields = field.Fields(interfaces.INamingSchema).select(
-                                                'text',
-                                                'po_domain',
-                                                )
+    fields = field.Fields(
+        interfaces.INamingSchema).select('text', 'po_domain',)
 
-    buttons = button.Buttons(interfaces.INamingSchema).select(
-                                                'set_title',
-                                                'set_description',
-                                                )
+    buttons = button.Buttons(
+        interfaces.INamingSchema).select('set_title', 'set_description',)
 
     @button.handler(interfaces.INamingSchema['set_title'])
     def set_title(self, action):
@@ -76,10 +72,10 @@ class NamingForm(FormMixin, form.Form):
         data, error = self.extractData()
 
         info, warnings, errors = utils.exec_for_all_langs(
-                                    context,
-                                    utils.set_po_title,
-                                    text=data.get('text', ''),
-                                    po_domain=data.get('po_domain', ''))
+            context,
+            utils.set_po_title,
+            text=data.get('text', ''),
+            po_domain=data.get('po_domain', ''))
 
         for msg in info:
             status.addStatusMessage(msg, type='info')
@@ -98,10 +94,10 @@ class NamingForm(FormMixin, form.Form):
         data, error = self.extractData()
 
         info, warnings, errors = utils.exec_for_all_langs(
-                                    context,
-                                    utils.set_po_description,
-                                    text=data.get('text', ''),
-                                    po_domain=data.get('po_domain', ''))
+            context,
+            utils.set_po_description,
+            text=data.get('text', ''),
+            po_domain=data.get('po_domain', ''))
 
         self.handle_status(status, info, warnings, errors)
 
@@ -120,15 +116,11 @@ class RenamingForm(FormMixin, form.Form):
         "new id."
     ignoreContext = True
 
-    fields = field.Fields(interfaces.IObjectHandlingSchema).select(
-                                            'old_id',
-                                            'new_id',
-                                            )
+    fields = field.Fields(
+        interfaces.IObjectHandlingSchema).select('old_id', 'new_id',)
 
-
-    buttons = button.Buttons(interfaces.IObjectHandlingSchema).select(
-                                            'rename',
-                                            )
+    buttons = button.Buttons(
+        interfaces.IObjectHandlingSchema).select('rename',)
 
     @button.handler(interfaces.IObjectHandlingSchema['rename'])
     def rename(self, action):
@@ -137,34 +129,32 @@ class RenamingForm(FormMixin, form.Form):
         data, error = self.extractData()
         old_id = data.get('old_id', '')
         new_id = data.get('new_id', '')
-        status.addStatusMessage(u'Rename from %s to %s.' % (old_id, new_id),
-            type="info")
+        status.addStatusMessage(
+            u'Rename from %s to %s.' % (old_id, new_id), type="info")
         info, warnings, errors = utils.exec_for_all_langs(
-                                                context,
-                                                utils.renamer,
-                                                oldid=old_id,
-                                                newid=new_id,
-                                                target_id=old_id,
-                                                )
+            context,
+            utils.renamer,
+            oldid=old_id,
+            newid=new_id,
+            target_id=old_id,)
 
         self.handle_status(status, info, warnings, errors)
 
 
 class CutAndPasteForm(FormMixin, form.Form):
     """ Cut and paste """
-    label = _(u"Cut and paste (move)")
-    description = _(u"Cut and paste (move) an object. Select an object from "\
-        u"the current folder to move. Enter the path to the target folder " \
-        u"where to object should be moved to.")
+    label = _("label_cut_and_paste_form", default=u"Cut and paste (move)")
+    description = _(
+        "description_cut_and_paste_form", default=u"Cut and paste (move) an "
+        u"object. Select an object from the current folder to move. Enter the "
+        u"path to the target folder where to object should be moved to.")
 
     ignoreContext = True
-    fields = field.Fields(interfaces.IObjectHandlingSchema).select(
-                                                'target_path',
-                                                'id_to_move',
-                                                )
+    fields = field.Fields(
+        interfaces.IObjectHandlingSchema).select('target_path', 'id_to_move',)
 
-    buttons = button.Buttons(interfaces.IObjectHandlingSchema).select(
-                                                'cut_and_paste')
+    buttons = button.Buttons(
+        interfaces.IObjectHandlingSchema).select('cut_and_paste')
 
     @button.handler(interfaces.IObjectHandlingSchema['cut_and_paste'])
     def cut_and_paste(self, action):
@@ -173,15 +163,15 @@ class CutAndPasteForm(FormMixin, form.Form):
         target_path = data.get('target_path', '')
         id_to_move = data.get('id_to_move', '')
         status = IStatusMessage(self.request)
-        status.addStatusMessage(_(u"Move object %s to %s" % (id_to_move,
-            target_path)), type="info")
+        status.addStatusMessage(_(u"Move object %s to %s" % (
+            id_to_move, target_path)), type="info")
 
         info, warnings, errors = utils.exec_for_all_langs(
-                                                context,
-                                                utils.cut_and_paste,
-                                                target_path=target_path,
-                                                id_to_move=id_to_move,
-                                                target_id=id_to_move)
+            context,
+            utils.cut_and_paste,
+            target_path=target_path,
+            id_to_move=id_to_move,
+            target_id=id_to_move)
         self.handle_status(status, info, warnings, errors)
 
     def widgets_and_actions(self):
@@ -198,15 +188,12 @@ class PortletForm(FormMixin, form.Form):
     description = u"Propagate the portlets set on the current " \
         u"object to all translations, or change the block status"
     ignoreContext = True
-    fields = field.Fields(interfaces.IPortletSchema).select(
-                                                'portlet_manager',
-                                                'blockstatus',
-                                                )
+    fields = field.Fields(
+        interfaces.IPortletSchema).select('portlet_manager', 'blockstatus',)
 
-    buttons = button.Buttons(interfaces.IPortletSchema).select(
-                                                'propagate_portlets',
-                                                'block_portlets',
-                                                )
+    buttons = button.Buttons(
+        interfaces.IPortletSchema).select(
+            'propagate_portlets', 'block_portlets',)
 
     @button.handler(interfaces.IPortletSchema['propagate_portlets'])
     def propagate_portlets(self, action):
@@ -228,17 +215,15 @@ class PortletForm(FormMixin, form.Form):
         managers = dict()
         for managername in managernames:
             managers[managername] = assignment_mapping_from_key(
-                                            context,
-                                            managername,
-                                            CONTEXT_CATEGORY,
-                                            path,
-                                            )
+                context,
+                managername,
+                CONTEXT_CATEGORY,
+                path,)
 
         info, warnings, errors = utils.exec_for_all_langs(
-                                                context,
-                                                utils.propagate_portlets,
-                                                managers=managers,
-                                                )
+            context,
+            utils.propagate_portlets,
+            managers=managers,)
         self.handle_status(status, info, warnings, errors)
 
     @button.handler(interfaces.IPortletSchema['block_portlets'])
@@ -246,7 +231,6 @@ class PortletForm(FormMixin, form.Form):
         status = IStatusMessage(self.request)
         context = Acquisition.aq_inner(self.context)
         data, error = self.extractData()
-        portlet_manager = data.get('portlet_manager', None)
         blockstatus = data.get('blockstatus', False)
 
         manager = data.get('portlet_manager', None)
@@ -262,18 +246,16 @@ class PortletForm(FormMixin, form.Form):
         managers = dict()
         for managername in managernames:
             managers[managername] = assignment_mapping_from_key(
-                                            context,
-                                            managername,
-                                            CONTEXT_CATEGORY,
-                                            path,
-                                            )
+                context,
+                managername,
+                CONTEXT_CATEGORY,
+                path,)
 
         info, warnings, errors = utils.exec_for_all_langs(
-                                                    context,
-                                                    utils.block_portlets,
-                                                    managers=managers,
-                                                    blockstatus=blockstatus,
-                                                    )
+            context,
+            utils.block_portlets,
+            managers=managers,
+            blockstatus=blockstatus,)
 
         self.handle_status(status, info, warnings, errors)
 
@@ -289,9 +271,8 @@ class ReindexForm(FormMixin, form.Form):
     """ """
     label = u"Reindex"
     description = u"Reindex this object and all its translations."
-    buttons = button.Buttons(interfaces.IReindexSchema).select(
-                                                'reindex_all',
-                                                )
+    buttons = button.Buttons(
+        interfaces.IReindexSchema).select('reindex_all',)
 
     @button.handler(interfaces.IReindexSchema['reindex_all'])
     def reindex_all(self, action):
@@ -315,28 +296,26 @@ class WokflowForm(FormMixin, form.Form):
         "translations."
     ignoreContext = True
 
-    fields = field.Fields(interfaces.IWorkflowSchema).select(
-                                                'transition',
-                                                )
-    buttons = button.Buttons(interfaces.IWorkflowSchema).select(
-                                                'do_action',
-                                                )
+    fields = field.Fields(
+        interfaces.IWorkflowSchema).select('transition',)
+    buttons = button.Buttons(
+        interfaces.IWorkflowSchema).select('do_action',)
 
     @button.handler(interfaces.IWorkflowSchema['do_action'])
     def do_action(self, action):
         data, error = self.extractData()
         transition = data.get('transition')
         status = IStatusMessage(self.request)
-        status.addStatusMessage(_(u"Perform workflow-action '%s' on this " \
-            u"object and all translations" % transition),
+        status.addStatusMessage(_(
+            u"Perform workflow-action '%s' on this object and all "
+            u"translations" % transition),
             type="info")
         context = Acquisition.aq_inner(self.context)
 
         info, warnings, errors = utils.exec_for_all_langs(
-                                                context,
-                                                utils.workflow_action,
-                                                transition=transition,
-                                                )
+            context,
+            utils.workflow_action,
+            transition=transition,)
 
         self.handle_status(status, info, warnings, errors)
 
@@ -352,12 +331,10 @@ class DuplicaterForm(FormMixin, form.Form):
 
     buttons = button.Buttons(interfaces.IDuplicaterSchema).select(
         'translate_this')
-    fields = field.Fields(interfaces.IDuplicaterSchema).select(
-                                                'attributes_to_copy',
-                                                'target_languages',
-                                                'use_parent_languages',
-                                                'translation_exists',
-                                                )
+    fields = field.Fields(
+        interfaces.IDuplicaterSchema).select(
+            'attributes_to_copy', 'target_languages', 'use_parent_languages',
+            'translation_exists',)
 
     @button.handler(interfaces.IDuplicaterSchema['translate_this'])
     def translate_this(self, action):
@@ -378,8 +355,8 @@ class DuplicaterForm(FormMixin, form.Form):
 
         status.addStatusMessage(msg, type="info")
 
-        info, warnings, errors = utils.translate_this(context,
-            attributes_to_copy, translation_exists, target_languages)
+        info, warnings, errors = utils.translate_this(
+            context, attributes_to_copy, translation_exists, target_languages)
 
         self.handle_status(status, info, warnings, errors)
 
@@ -388,13 +365,11 @@ class DeleterForm(FormMixin, form.Form):
     """ """
     label = u"Deleter"
     ignoreContext = True
-    fields = field.Fields(interfaces.IObjectHandlingSchema).select(
-                                                'id_to_delete',
-                                                )
+    fields = field.Fields(
+        interfaces.IObjectHandlingSchema).select('id_to_delete',)
 
-    buttons = button.Buttons(interfaces.IObjectHandlingSchema).select(
-                                                'delete',
-                                                )
+    buttons = button.Buttons(
+        interfaces.IObjectHandlingSchema).select('delete',)
 
     @button.handler(interfaces.IObjectHandlingSchema['delete'])
     def delete(self, action):
@@ -403,14 +378,13 @@ class DeleterForm(FormMixin, form.Form):
         context = Acquisition.aq_inner(self.context)
         data, error = self.extractData()
         id_to_delete = data.get('id_to_delete')
-        status.addStatusMessage(u'Delete object %s' % id_to_delete,
-            type='info')
+        status.addStatusMessage(
+            u'Delete object %s' % id_to_delete, type='info')
         info, warnings, errors = utils.exec_for_all_langs(
-                                                context,
-                                                utils.delete_this,
-                                                id_to_delete=id_to_delete,
-                                                target_id=id_to_delete,
-                                                )
+            context,
+            utils.delete_this,
+            id_to_delete=id_to_delete,
+            target_id=id_to_delete,)
 
         self.handle_status(status, info, warnings, errors)
 
@@ -419,17 +393,13 @@ class PropertyForm(FormMixin, form.Form):
     """ """
     label = u"Properties"
     ignoreContext = True
-    fields = field.Fields(interfaces.IPropertySchema).select(
-                                                'property_id',
-                                                'property_type',
-                                                'property_value',
-                                                'property_to_delete',
-                                                )
+    fields = field.Fields(
+        interfaces.IPropertySchema).select(
+            'property_id', 'property_type', 'property_value',
+            'property_to_delete',)
 
-    buttons = button.Buttons(interfaces.IPropertySchema).select(
-                                                'set_property',
-                                                'delete_property',
-                                                )
+    buttons = button.Buttons(
+        interfaces.IPropertySchema).select('set_property', 'delete_property',)
 
     @button.handler(interfaces.IPropertySchema['set_property'])
     def set_property(self, action):
@@ -443,12 +413,11 @@ class PropertyForm(FormMixin, form.Form):
             property_value = property_value.encode('utf-8')
         status.addStatusMessage(u'Set property %s' % property_id, type='info')
         info, warnings, errors = utils.exec_for_all_langs(
-                                    context,
-                                    utils.set_property,
-                                    property_id=property_id,
-                                    property_type=data.get('property_type'),
-                                    property_value=property_value,
-                                    )
+            context,
+            utils.set_property,
+            property_id=property_id,
+            property_type=data.get('property_type'),
+            property_value=property_value,)
 
         self.handle_status(status, info, warnings, errors)
 
@@ -459,13 +428,12 @@ class PropertyForm(FormMixin, form.Form):
         context = Acquisition.aq_inner(self.context)
         data, error = self.extractData()
         property_id = data.get('property_to_delete')
-        status.addStatusMessage(u'Delete property %s' % property_id,
-            type='info')
+        status.addStatusMessage(
+            u'Delete property %s' % property_id, type='info')
         info, warnings, errors = utils.exec_for_all_langs(
-                                                context,
-                                                utils.delete_property,
-                                                property_id=property_id,
-                                                )
+            context,
+            utils.delete_property,
+            property_id=property_id,)
 
         self.handle_status(status, info, warnings, errors)
 
@@ -486,30 +454,27 @@ class MarkerInterfaceForm(FormMixin, form.Form):
         "of its translations."
     ignoreContext = True
 
-    fields = field.Fields(interfaces.IMarkerInterfacesSchema).select(
-                                                'interface_to_add',
-                                                'interface_to_remove',
-                                                )
-    buttons = button.Buttons(interfaces.IMarkerInterfacesSchema).select(
-                                                'add_interface',
-                                                'remove_interface',
-                                                )
+    fields = field.Fields(
+        interfaces.IMarkerInterfacesSchema).select(
+            'interface_to_add', 'interface_to_remove',)
+    buttons = button.Buttons(
+        interfaces.IMarkerInterfacesSchema).select(
+            'add_interface', 'remove_interface',)
 
     @button.handler(interfaces.IMarkerInterfacesSchema['add_interface'])
     def add_interface(self, action):
         data, error = self.extractData()
         interface_to_add = data.get('interface_to_add')
         status = IStatusMessage(self.request)
-        status.addStatusMessage(_(u"Add marker interface '%s' on this " \
-            u"object and all translations" % interface_to_add),
-            type="info")
+        status.addStatusMessage(_(
+            u"Add marker interface '%s' on this "
+            u"object and all translations" % interface_to_add), type="info")
         context = Acquisition.aq_inner(self.context)
 
         info, warnings, errors = utils.exec_for_all_langs(
-                                    context,
-                                    utils.add_interface,
-                                    interface_to_add=interface_to_add,
-                                    )
+            context,
+            utils.add_interface,
+            interface_to_add=interface_to_add,)
 
         self.handle_status(status, info, warnings, errors)
 
@@ -518,16 +483,15 @@ class MarkerInterfaceForm(FormMixin, form.Form):
         data, error = self.extractData()
         interface_to_remove = data.get('interface_to_remove')
         status = IStatusMessage(self.request)
-        status.addStatusMessage(_(u"Remove marker interface '%s' on this " \
-            u"object and all translations" % interface_to_remove),
-            type="info")
+        status.addStatusMessage(_(
+            u"Remove marker interface '%s' on this object and all "
+            u"translations" % interface_to_remove), type="info")
         context = Acquisition.aq_inner(self.context)
 
         info, warnings, errors = utils.exec_for_all_langs(
-                                    context,
-                                    utils.remove_interface,
-                                    interface_to_remove=interface_to_remove,
-                                    )
+            context,
+            utils.remove_interface,
+            interface_to_remove=interface_to_remove,)
 
         self.handle_status(status, info, warnings, errors)
 
@@ -537,5 +501,3 @@ class MarkerInterfaceForm(FormMixin, form.Form):
         ls.append((self.widgets.get('interface_to_remove'), 'widget'))
         ls.append((self.actions.get('remove_interface'), 'action'))
         return ls
-
-

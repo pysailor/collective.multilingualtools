@@ -18,19 +18,19 @@ class MultilingualToolsView(FormWrapper):
     implements(IMultilingualForm)
     id = u'multilingualtools'
 
-    form = None # override this with a form class.
+    form = None  # override this with a form class.
     forms = [
-            forms.NamingForm,
-            forms.PortletForm,
-            forms.RenamingForm,
-            forms.CutAndPasteForm,
-            forms.DeleterForm,
-            forms.ReindexForm,
-            forms.WokflowForm,
-            forms.PropertyForm,
-            forms.MarkerInterfaceForm,
-            forms.DuplicaterForm,
-            ]
+        forms.NamingForm,
+        forms.PortletForm,
+        forms.RenamingForm,
+        forms.CutAndPasteForm,
+        forms.DeleterForm,
+        forms.ReindexForm,
+        forms.WokflowForm,
+        forms.PropertyForm,
+        forms.MarkerInterfaceForm,
+        forms.DuplicaterForm,
+    ]
 
     def __init__(self, context, request):
         super(MultilingualToolsView, self).__init__(context, request)
@@ -71,6 +71,7 @@ class MultilingualToolsView(FormWrapper):
 
     def getContentLanguage(self):
         content_language = ILanguage(self.context).get_language()
+        return content_language
 
     def getContentTranslations(self):
         manager = ITranslationManager(self.context)

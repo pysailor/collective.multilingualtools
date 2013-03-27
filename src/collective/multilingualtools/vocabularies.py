@@ -1,7 +1,6 @@
 from plone.portlets.interfaces import IPortletManager
 
 from zope import component
-from zope.component.hooks import getSite
 from zope.schema.interfaces import IVocabularyFactory
 from zope.interface import implements
 from zope.schema.vocabulary import SimpleTerm
@@ -9,8 +8,7 @@ from zope.schema.vocabulary import SimpleVocabulary
 from Products.CMFCore.utils import getToolByName
 from plone.multilingual.interfaces import (
     ILanguage,
-    ITranslatable,
-    ITranslationManager)
+    ITranslatable)
 from Products.Five.utilities.interfaces import IMarkerInterfaces
 
 
@@ -22,7 +20,8 @@ class PortletManagerVocabulary(object):
     def __call__(self, context):
         self.context = context
         # look up all portlet managers, but filter oit dashboard stuff
-        names = [x[0] for x in component.getUtilitiesFor(IPortletManager)
+        names = [
+            x[0] for x in component.getUtilitiesFor(IPortletManager)
             if not x[0].startswith('plone.dashboard')]
         terms = [SimpleTerm(x, title=x) for x in names]
 
@@ -38,10 +37,12 @@ class TranslatableFieldsVocabulary(object):
 
     def __call__(self, context):
         self.context = context
-        fields = [x for x in context.Schema().fields()
+        fields = [
+            x for x in context.Schema().fields()
             if not x.languageIndependent]
         # look up all portlet managers, but filter oit dashboard stuff
-        terms = [SimpleTerm(x.getName(), title=x.getName()) for x in fields
+        terms = [
+            SimpleTerm(x.getName(), title=x.getName()) for x in fields
             if x.getName() != 'id']
 
         return SimpleVocabulary(terms)
@@ -57,8 +58,10 @@ class AvailableIdsVocabulary(object):
     def __call__(self, context):
         self.context = context
         # return all items in the current folder that are translatable
-        terms = [SimpleTerm(id, title=u'%s (%s)' % (unicode(obj.Title(),
-            'utf-8'), id)) for id, obj in context.objectItems()
+        terms = [
+            SimpleTerm(id, title=u'%s (%s)' % (
+                unicode(obj.Title(), 'utf-8'), id))
+            for id, obj in context.objectItems()
             if ITranslatable.providedBy(obj)]
 
         return SimpleVocabulary(terms)
@@ -71,8 +74,8 @@ class PropertyTypesVocabulary(object):
         The list ist hard-coded, just like in the
         manage_propertiesForm of OFS...
     """
-    TYPES_ = ['string', 'boolean', 'date', 'float', 'int', 'lines',
-        'long', 'text']
+    TYPES_ = [
+        'string', 'boolean', 'date', 'float', 'int', 'lines', 'long', 'text']
     implements(IVocabularyFactory)
 
     def __call__(self, context):
@@ -93,7 +96,8 @@ class AvailablePropertiesVocabulary(object):
     def __call__(self, context):
         self.context = context
 
-        terms = [SimpleTerm(id, title="%s (%s)" % (id, title)) for
+        terms = [
+            SimpleTerm(id, title="%s (%s)" % (id, title)) for
             id, title in context.propertyItems() if id != 'title']
 
         return SimpleVocabulary(terms)
@@ -111,8 +115,9 @@ class SupportedLanguagesVocabulary(object):
         self.context = context
         content_language = ILanguage(context).get_language()
         portal_languages = getToolByName(context, 'portal_languages')
-        terms = [SimpleTerm(id, title=title) for
-            id, title in portal_languages.listSupportedLanguages()
+        terms = [
+            SimpleTerm(id, title=title) for id, title in
+            portal_languages.listSupportedLanguages()
             if id != content_language]
 
         return SimpleVocabulary(terms)
@@ -135,8 +140,8 @@ class AvailableWorkflowTransitions(object):
         workflows = portal_workflow.getWorkflowsFor(context)
         for workflow in workflows:
             if getattr(workflow, 'transitions', None):
-                terms.extend(SimpleTerm(id, title=id) for id in
-                    workflow.transitions)
+                terms.extend(
+                    SimpleTerm(id, title=id) for id in workflow.transitions)
 
         return SimpleVocabulary(terms)
 
@@ -153,7 +158,8 @@ class AvailableMarkerInterfaces(object):
     def __call__(self, context):
         self.context = context
         adapted = IMarkerInterfaces(context)
-        terms = [SimpleTerm(x, title=x) for x in
+        terms = [
+            SimpleTerm(x, title=x) for x in
             adapted.getAvailableInterfaceNames()]
         return SimpleVocabulary(terms)
 
@@ -170,7 +176,8 @@ class ProvidedeMarkerInterfaces(object):
     def __call__(self, context):
         self.context = context
         adapted = IMarkerInterfaces(context)
-        terms = [SimpleTerm(x, title=x) for x in
+        terms = [
+            SimpleTerm(x, title=x) for x in
             adapted.getDirectlyProvidedNames()]
         return SimpleVocabulary(terms)
 
