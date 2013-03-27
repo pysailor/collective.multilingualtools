@@ -242,15 +242,3 @@ class IMarkerInterfacesSchema(interface.Interface):
         required=False,
         vocabulary="collective.multilingualtools.vocabularies.provided_interfaces",
     )
-
-
-class IOutdatedSchema(interface.Interface):
-    """ Schema for the toggle-outdated form """
-    toggle_outdated = button.Button(title=u'Set outdated status')
-
-    outdated_status = schema.Bool(
-        title=u"Tick the box to mark as outdated, or leave it unchecked "\
-            "to remove the outdated status flag.",
-        description=u"",
-        required=False
-    )
