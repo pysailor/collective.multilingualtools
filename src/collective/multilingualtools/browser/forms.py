@@ -196,7 +196,7 @@ class CutAndPasteForm(FormMixin, form.Form):
 class PortletForm(FormMixin, form.Form):
     """ """
     label = u"Portlets"
-    description = u"Propagate the portlets set on the current canonical " \
+    description = u"Propagate the portlets set on the current " \
         u"object to all translations, or change the block status"
     ignoreContext = True
     fields = field.Fields(interfaces.IPortletSchema).select(

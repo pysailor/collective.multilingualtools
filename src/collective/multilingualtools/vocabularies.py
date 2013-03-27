@@ -127,7 +127,7 @@ AvailablePropertiesVocabularyFactory = AvailablePropertiesVocabulary()
 
 class SupportedLanguagesVocabulary(object):
     """ Vocabulary that returns all supported languages of the site
-        except for the canonical language
+        except for the current language
     """
     implements(IVocabularyFactory)
 

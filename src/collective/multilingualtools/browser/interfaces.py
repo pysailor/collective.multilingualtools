@@ -145,7 +145,7 @@ class IDuplicaterSchema(interface.Interface):
 
     target_languages = schema.List(title=u'Manual language selection',
             description=u'Select the languages to which you want to make a '\
-            u'copy of the canonical object. Leave blank to select all '\
+            u'copy of the current object. Leave blank to select all '\
             u'available languages.',
             default=list(),
             required=False,
@@ -156,7 +156,7 @@ class IDuplicaterSchema(interface.Interface):
 
     use_parent_languages = schema.Bool(title=u"Use parent folder's languages",
             description=u'Tick this box to copy the object to all languages '\
-            u'in which the folder that contains the canonical object is '\
+            u'in which the folder that contains it (= parent folder) is '\
             u'available. This setting takes precedence over the manual '\
             u'selection above.',
             required=False,
