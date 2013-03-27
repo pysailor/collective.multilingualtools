@@ -41,7 +41,7 @@ class IObjectHandlingSchema(interface.Interface):
             u"drop-down displays the available objects with their titles plus "
             u"their id in bracktets."),
         required=False,
-        vocabulary="collective.multilingualtools.vocabularies.available_ids",
+        vocabulary="multilingualtools.vocabularies.available_ids",
     )
 
     new_id = schema.TextLine(
@@ -59,7 +59,7 @@ class IObjectHandlingSchema(interface.Interface):
             "description_id_to_delete", default=u"Select an object that should"
             u" be deleted in all languages."),
         required=False,
-        vocabulary="collective.multilingualtools.vocabularies.available_ids",
+        vocabulary="multilingualtools.vocabularies.available_ids",
     )
 
     id_to_move = schema.Choice(
@@ -67,7 +67,7 @@ class IObjectHandlingSchema(interface.Interface):
         description=_(
             "description_id_to_move", default=u"Choose an object to move."),
         required=False,
-        vocabulary="collective.multilingualtools.vocabularies.available_ids",
+        vocabulary="multilingualtools.vocabularies.available_ids",
     )
 
     target_path = schema.TextLine(
@@ -104,7 +104,7 @@ class IPortletSchema(interface.Interface):
             u" on which to perform the desired action. Leave unselected to "
             u"perform the action for all portlet slots."),
         required=False,
-        vocabulary="collective.multilingualtools.vocabularies.portletmanagers",
+        vocabulary="multilingualtools.vocabularies.portletmanagers",
     )
 
 
@@ -123,7 +123,7 @@ class IWorkflowSchema(interface.Interface):
             "description_transition", default=u"Use this form to change the "
             u"workflow status of the current object and all translations."),
         required=False,
-        vocabulary="collective.multilingualtools.vocabularies.available_wf_transitions",
+        vocabulary="multilingualtools.vocabularies.available_wf_transitions",
     )
 
 
@@ -140,7 +140,7 @@ class IDuplicaterSchema(interface.Interface):
         default=list(),
         required=False,
         value_type=schema.Choice(
-            vocabulary="collective.multilingualtools.vocabularies.translatable_fields",
+            vocabulary="multilingualtools.vocabularies.translatable_fields",
         ),
     )
 
@@ -154,7 +154,7 @@ class IDuplicaterSchema(interface.Interface):
         default=list(),
         required=False,
         value_type=schema.Choice(
-            vocabulary="collective.multilingualtools.vocabularies.supported_languages",
+            vocabulary="multilingualtools.vocabularies.supported_languages",
         ),
     )
 
@@ -196,7 +196,7 @@ class IPropertySchema(interface.Interface):
             "description_property_type", default=u"Select the correct property"
             u" type"),
         required=False,
-        vocabulary="collective.multilingualtools.vocabularies.available_property_types",
+        vocabulary="multilingualtools.vocabularies.available_property_types",
     )
 
     property_value = schema.TextLine(
@@ -213,7 +213,7 @@ class IPropertySchema(interface.Interface):
             "description_property_to_delete", default=u"Select a property to "
             u"delete"),
         required=False,
-        vocabulary="collective.multilingualtools.vocabularies.available_property_ids",
+        vocabulary="multilingualtools.vocabularies.available_property_ids",
     )
 
     set_property = button.Button(title=u'Set property')
@@ -231,7 +231,7 @@ class IMarkerInterfacesSchema(interface.Interface):
             "description_interface_to_add", default=u"Select a marker "
             u"interface to be added to all translations"),
         required=False,
-        vocabulary="collective.multilingualtools.vocabularies.available_interfaces",
+        vocabulary="multilingualtools.vocabularies.available_interfaces",
     )
 
     interface_to_remove = schema.Choice(
@@ -240,5 +240,5 @@ class IMarkerInterfacesSchema(interface.Interface):
             "description_interface_to_remove", default=u"Select a marker "
             u"interface to be removed from all translations."),
         required=False,
-        vocabulary="collective.multilingualtools.vocabularies.provided_interfaces",
+        vocabulary="multilingualtools.vocabularies.provided_interfaces",
     )

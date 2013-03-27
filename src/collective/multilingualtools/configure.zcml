@@ -27,47 +27,47 @@
     <!-- Vocabularies -->
     <utility
         component=".vocabularies.PortletManagerVocabularyFactory"
-        name="collective.multilingualtools.vocabularies.portletmanagers"
+        name="multilingualtools.vocabularies.portletmanagers"
         />
 
     <utility
         component=".vocabularies.TranslatableFieldsVocabularyFactory"
-        name="collective.multilingualtools.vocabularies.translatable_fields"
+        name="multilingualtools.vocabularies.translatable_fields"
         />
 
     <utility
         component=".vocabularies.AvailableIdsVocabularyFactory"
-        name="collective.multilingualtools.vocabularies.available_ids"
+        name="multilingualtools.vocabularies.available_ids"
         />
 
     <utility
         component=".vocabularies.PropertyTypesVocabularyFactory"
-        name="collective.multilingualtools.vocabularies.available_property_types"
+        name="multilingualtools.vocabularies.available_property_types"
         />
 
     <utility
         component=".vocabularies.AvailablePropertiesVocabularyFactory"
-        name="collective.multilingualtools.vocabularies.available_property_ids"
+        name="multilingualtools.vocabularies.available_property_ids"
         />
 
     <utility
         component=".vocabularies.SupportedLanguagesVocabularyFactory"
-        name="collective.multilingualtools.vocabularies.supported_languages"
+        name="multilingualtools.vocabularies.supported_languages"
         />
 
     <utility
         component=".vocabularies.AvailableWorkflowTransitionsFactory"
-        name="collective.multilingualtools.vocabularies.available_wf_transitions"
+        name="multilingualtools.vocabularies.available_wf_transitions"
         />
 
     <utility
         component=".vocabularies.AvailableMarkerInterfacesFactory"
-        name="collective.multilingualtools.vocabularies.available_interfaces"
+        name="multilingualtools.vocabularies.available_interfaces"
         />
 
     <utility
         component=".vocabularies.ProvidedeMarkerInterfacesFactory"
-        name="collective.multilingualtools.vocabularies.provided_interfaces"
+        name="multilingualtools.vocabularies.provided_interfaces"
         />
 
 </configure>
