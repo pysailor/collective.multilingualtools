@@ -144,62 +144,77 @@ class IDuplicaterSchema(interface.Interface):
         ),
     )
 
-    target_languages = schema.List(title=u'Manual language selection',
-            description=u'Select the languages to which you want to make a '\
-            u'copy of the current object. Leave blank to select all '\
-            u'available languages.',
-            default=list(),
-            required=False,
-            value_type=schema.Choice(
-                vocabulary="collective.multilingualtools.vocabularies.supported_languages",
-                ),
-            )
+    target_languages = schema.List(
+        title=_(
+            "title_target_languages", default=u'Manual language selection'),
+        description=_(
+            "description_target_languages", u'Select the languages to which '
+            u'you want to make a copy of the current object. Leave blank to '
+            u'use all available languages.'),
+        default=list(),
+        required=False,
+        value_type=schema.Choice(
+            vocabulary="collective.multilingualtools.vocabularies.supported_languages",
+        ),
+    )
 
-    use_parent_languages = schema.Bool(title=u"Use parent folder's languages",
-            description=u'Tick this box to copy the object to all languages '\
-            u'in which the folder that contains it (= parent folder) is '\
-            u'available. This setting takes precedence over the manual '\
-            u'selection above.',
-            required=False,
-            )
+    use_parent_languages = schema.Bool(
+        title=_(
+            "title_use_parent_languages", default=u"Use parent folder's "
+            u"languages"),
+        description=_(
+            "description_use_parent_languages", default=u'Tick this box to '
+            u'copy the object to all languages in which the folder that '
+            u'contains it (= parent folder) is available. This setting takes '
+            u'precedence over the manual selection above.'),
+        required=False,
+    )
 
     translation_exists = schema.Bool(
-            title=u"Translation exists",
-            description=u"Tick this box if a translation alreay exits and "\
-                u"you just want to propagate attributes or Collection "\
-                u"criteria.",
-            required=False,
-            )
+        title=_("title_translation_exists", default=u"Translation exists"),
+        description=_(
+            "description_translation_exists", default=u"Tick this box if a "
+            u"translation alreay exits and you just want to propagate "
+            u"attributes or Collection criteria"),
+        required=False,
+    )
 
 
 class IPropertySchema(interface.Interface):
     """ Schema for setting and removing properties """
 
     property_id = schema.TextLine(
-        title=u"Property id",
-        description=u"Enter a property id",
+        title=_("title_property_id", default=u"Property id"),
+        description=_(
+            "description_property_id", default=u"Enter a property id"),
         required=False,
-        )
+    )
 
     property_type = schema.Choice(
-            title=u"Property type",
-            description=u"Select the correct property type",
-            required=False,
-            vocabulary="collective.multilingualtools.vocabularies.available_property_types",
-            )
+        title=_("title_property_type", default=u"Property type"),
+        description=_(
+            "description_property_type", default=u"Select the correct property"
+            u" type"),
+        required=False,
+        vocabulary="collective.multilingualtools.vocabularies.available_property_types",
+    )
 
     property_value = schema.TextLine(
-        title=u"Property value",
-        description=u"Enter a value for the property",
+        title=_("title_property_value", default=u"Property value"),
+        description=_(
+            "description_property_value", default=u"Enter a value for the "
+            u"property"),
         required=False,
-        )
+    )
 
     property_to_delete = schema.Choice(
-            title=u"Property to delete",
-            description=u"Select a property to delete",
-            required=False,
-            vocabulary="collective.multilingualtools.vocabularies.available_property_ids",
-            )
+        title=_("title_property_to_delete", default=u"Property to delete"),
+        description=_(
+            "description_property_to_delete", default=u"Select a property to "
+            u"delete"),
+        required=False,
+        vocabulary="collective.multilingualtools.vocabularies.available_property_ids",
+    )
 
     set_property = button.Button(title=u'Set property')
     delete_property = button.Button(title=u'Delete property')
@@ -211,20 +226,22 @@ class IMarkerInterfacesSchema(interface.Interface):
     add_interface = button.Button(title=u'Add selected interface')
 
     interface_to_add = schema.Choice(
-            title=u"Available interfaces",
-            description=u"Select a marker interface to add to all " \
-                u"translations",
-            required=False,
-            vocabulary="collective.multilingualtools.vocabularies.available_interfaces",
-            )
+        title=_("title_interface_to_add", default=u"Available interfaces"),
+        description=_(
+            "description_interface_to_add", default=u"Select a marker "
+            u"interface to be added to all translations"),
+        required=False,
+        vocabulary="collective.multilingualtools.vocabularies.available_interfaces",
+    )
 
     interface_to_remove = schema.Choice(
-            title=u"Provided interfaces",
-            description=u"Select a marker interface to remove from all " \
-                u"translations",
-            required=False,
-            vocabulary="collective.multilingualtools.vocabularies.provided_interfaces",
-            )
+        title=_("title_interface_to_remove", default=u"Provided interfaces"),
+        description=_(
+            "description_interface_to_remove", default=u"Select a marker "
+            u"interface to be removed from all translations."),
+        required=False,
+        vocabulary="collective.multilingualtools.vocabularies.provided_interfaces",
+    )
 
 
 class IOutdatedSchema(interface.Interface):
@@ -232,7 +249,8 @@ class IOutdatedSchema(interface.Interface):
     toggle_outdated = button.Button(title=u'Set outdated status')
 
     outdated_status = schema.Bool(
-            title=u"Tick the box to mark as outdated, or leave it unchecked "\
-                "to remove the outdated status flag.",
-            description=u"",
-            required=False)
+        title=u"Tick the box to mark as outdated, or leave it unchecked "\
+            "to remove the outdated status flag.",
+        description=u"",
+        required=False
+    )
