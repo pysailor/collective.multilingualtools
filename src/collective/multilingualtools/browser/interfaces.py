@@ -196,6 +196,7 @@ class IPropertySchema(interface.Interface):
             "description_property_type", default=u"Select the correct property"
             u" type"),
         required=False,
+        default='string',
         vocabulary="multilingualtools.vocabularies.available_property_types",
     )
 
