@@ -1,3 +1,6 @@
+from zope.i18nmessageid import MessageFactory
+_ = MessageFactory('collective.multilungualtools')
+
 try:
     from p4a.subtyper.interfaces import ISubtyper
 except ImportError:

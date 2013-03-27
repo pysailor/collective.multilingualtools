@@ -1,3 +1,4 @@
+from collective.multilingualtools import _
 from zope import interface, schema
 from z3c.form import button
 
@@ -6,23 +7,25 @@ class INamingSchema(interface.Interface):
     """ Base Schema for the edit form. It is dynamically extended by plugins
     """
     text = schema.Text(
-            title=u"Text",
-            description=u"Type some text. This text will then be written on "\
-                u"all translations as Title, as Description or as a " \
-                u"translation of a message id, depending on your further "\
-                u"choices in this form.",
-            required=True,
-            )
+        title=_("title_text", default=u"Text"),
+        description=_(
+            "description_text", default=u"Type some text. This text will then "
+            u"be written on all translations as Title or Description, "
+            u"depending on your further choices in this form."),
+        required=True,
+    )
 
     po_domain = schema.TextLine(
-            title=u"PO Domain",
-            description=u"Give a po file domain here, if you have typed a "\
-                u"message id in the field above. Then its translation will " \
-                u"be written. If you leave the domain empty or state a non-" \
-                u"existing one, the text above will be written as-is.",
-            default=u"plone",
-            required=False,
-            )
+        title=_("title_po_domain", default=u"PO Domain"),
+        description=_(
+            "description_po_domain", default=u"Give a po domain here, if you "
+            u"have typed a message id in the field above. The translation for "
+            u"this domain of the message you have typed will then be written "
+            u"as Title / Description. If you leave the domain empty or state a"
+            u"non-existing one, the text above will be written verbatim."),
+        default=u"plone",
+        required=False,
+    )
 
     set_title = button.Button(title=u'Set text as Title')
     set_description = button.Button(title=u'Set text as Description')
@@ -32,42 +35,50 @@ class IObjectHandlingSchema(interface.Interface):
     """ object handling """
 
     old_id = schema.Choice(
-            title=u"Object to rename",
-            description=u"Choose an object to rename. The drop-down displays "\
-                u"the available objects with title and id in bracktets.",
-            required=False,
-            vocabulary="collective.multilingualtools.vocabularies.available_ids",
-            )
+        title=_("title_old_id", default=u"Object to rename"),
+        description=_(
+            "description_old_id", default=u"Choose an object to rename. The "
+            u"drop-down displays the available objects with their titles plus "
+            u"their id in bracktets."),
+        required=False,
+        vocabulary="collective.multilingualtools.vocabularies.available_ids",
+    )
 
     new_id = schema.TextLine(
-            title=u"New id",
-            description=u"Enter the id (short name) the object should "\
-                u"receive.",
-            required=False,
-            )
+        title=_("title_new_id", default=u"New id"),
+        description=_(
+            "description_new_id", default=u"Enter the id (short name) that"
+            u"all translations of this item should receive."
+        ),
+        required=False,
+    )
 
     id_to_delete = schema.Choice(
-            title=u"Object to delete",
-            description=u"Select an object that should be deleted in all "\
-                u"languages.",
-            required=False,
-            vocabulary="collective.multilingualtools.vocabularies.available_ids",
-            )
+        title=_("title_id_to_delete", default=u"Object to delete"),
+        description=_(
+            "description_id_to_delete", default=u"Select an object that should"
+            u" be deleted in all languages."),
+        required=False,
+        vocabulary="collective.multilingualtools.vocabularies.available_ids",
+    )
 
     id_to_move = schema.Choice(
-            title=u"Object to move",
-            description=u"Choose an object to move.",
-            required=False,
-            vocabulary="collective.multilingualtools.vocabularies.available_ids",
-            )
+        title=_("title_id_to_move", default=u"Object to move"),
+        description=_(
+            "description_id_to_move", default=u"Choose an object to move."),
+        required=False,
+        vocabulary="collective.multilingualtools.vocabularies.available_ids",
+    )
 
     target_path = schema.TextLine(
-        title=u"Target path",
-        description=u"Enter either an absolute path or a path relative to "\
-            u"the current location. Examples: '/en/path/to/folder' " \
-            u"(absolute); 'subfolder/from/here' or '../' (relative)",
+        title=_("title_target_path", default=u"Target path"),
+        description=_(
+            "description_target_path", default=u"Enter either an absolute path"
+            u" or a path relative to the current location. Examples: "
+            u"'/en/path/to/folder' (absolute); 'subfolder/from/here' or '../'"
+            u" (relative)"),
         required=False,
-        )
+    )
 
     rename = button.Button(title=u'Rename')
     delete = button.Button(title=u'Delete')
@@ -81,19 +92,20 @@ class IPortletSchema(interface.Interface):
     block_portlets = button.Button(title=u'Block Portlets')
 
     blockstatus = schema.Bool(
-            title=u"Check to block",
-            description=u"",
-            required=False)
+        title=_("title_blockstatus", default=u"Check to block"),
+        description=u"",
+        required=False,
+    )
 
     portlet_manager = schema.Choice(
-            title=u"Portlet manager",
-            description=u"Select a portlet manager. It is used to determine "\
-                u"where to block/unblock portlets on, or which portlets "\
-                u"should be propagated. Leave unselected to do the action "\
-                u"for all portlet slots.",
-            required=False,
-            vocabulary="collective.multilingualtools.vocabularies.portletmanagers",
-            )
+        title=_("title_portlet_manager", default=u"Portlet manager"),
+        description=_(
+            "description_portlet_manager", default=u"Select a portlet manager"
+            u" on which to perform the desired action. Leave unselected to "
+            u"perform the action for all portlet slots."),
+        required=False,
+        vocabulary="collective.multilingualtools.vocabularies.portletmanagers",
+    )
 
 
 class ISubtyperSchema(interface.Interface):
@@ -103,12 +115,13 @@ class ISubtyperSchema(interface.Interface):
     remove_subtype = button.Button(title=u'Remove Subtype')
 
     subtype = schema.Choice(
-            title=u"Available Subtypes",
-            description=u"Use this to subtype the object and its "\
-                u"translations.",
-            required=False,
-            vocabulary="collective.multilingualtools.vocabularies.subtypes",
-            )
+        title=_("title_subtype", default=u"Available Subtypes"),
+        description=_(
+            "description_subtype", default=u"Add or remove the selected "
+            u"subtype on all translations."),
+        required=False,
+        vocabulary="collective.multilingualtools.vocabularies.subtypes",
+    )
 
 
 class IReindexSchema(interface.Interface):
@@ -121,27 +134,31 @@ class IWorkflowSchema(interface.Interface):
     do_action = button.Button(title=u'Perform workflow change')
 
     transition = schema.Choice(
-            title=u"Available actions",
-            description=u"Use this form to change the workflow of the " \
-                u"current object and all translations.",
-            required=False,
-            vocabulary="collective.multilingualtools.vocabularies.available_wf_transitions",
-            )
+        title=_("title_transition", default=u"Available actions"),
+        description=_(
+            "description_transition", default=u"Use this form to change the "
+            u"workflow status of the current object and all translations."),
+        required=False,
+        vocabulary="collective.multilingualtools.vocabularies.available_wf_transitions",
+    )
 
 
 class IDuplicaterSchema(interface.Interface):
     """ Schema for object duplication"""
     translate_this = button.Button(title=u'Translate this object')
 
-    attributes_to_copy = schema.List(title=u'Attributes to copy',
-            description=u'Select one or more attributes to have their values '\
-                u'copied over to the translations',
-            default=list(),
-            required=False,
-            value_type=schema.Choice(
-                vocabulary="collective.multilingualtools.vocabularies.translatable_fields",
-                ),
-            )
+    attributes_to_copy = schema.List(
+        title=_("title_attributes_to_copy", default=u'Attributes to copy'),
+        description=_(
+            "description_attributes_to_copy", default=u'Select one or more '
+            u'attributes to have their values copied over to the '
+            u'translations.'),
+        default=list(),
+        required=False,
+        value_type=schema.Choice(
+            vocabulary="collective.multilingualtools.vocabularies.translatable_fields",
+        ),
+    )
 
     target_languages = schema.List(title=u'Manual language selection',
             description=u'Select the languages to which you want to make a '\
