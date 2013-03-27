@@ -51,7 +51,7 @@ def exec_for_all_langs(context, method, *args, **kw):
 
     context_path = context.getPhysicalPath()
     dynamic_path = portal_path + '/%s/' + \
-                "/".join(context_path[len(portal_path) + 1:])
+        "/".join(context_path[len(portal_path) + 1:])
     if dynamic_path[-1] == "/":
         dynamic_path = dynamic_path[:-1]
 
@@ -105,11 +105,11 @@ def exec_for_all_langs(context, method, *args, **kw):
 
 def block_portlets(ob, *args, **kw):
     """ Block the Portlets on a given context, manager, and Category """
-    canmanagers = kw['managers']
+    pl_managers = kw['managers']
     blockstatus = kw['blockstatus']
-    for canmanagername, canmanager in canmanagers.items():
+    for pl_managername, pl_manager in pl_managers.items():
         portletManager = zope.component.getUtility(
-            IPortletManager, name=canmanagername)
+            IPortletManager, name=pl_managername)
         assignable = zope.component.getMultiAdapter(
             (ob, portletManager, ), ILocalPortletAssignmentManager)
         assignable.setBlacklistStatus(CONTEXT_CATEGORY, blockstatus)
@@ -123,20 +123,20 @@ def get_portlet_manager_names():
 
 
 def propagate_portlets(ob, *args, **kw):
-    canmanagers = kw['managers']
+    pl_managers = kw['managers']
 
     # skip current objects
     if kw['lang'] == kw['content_language']:
         return
     path = "/".join(ob.getPhysicalPath())
 
-    for canmanagername, canmanager in canmanagers.items():
+    for pl_managername, pl_manager in pl_managers.items():
         manager = assignment_mapping_from_key(
-            ob, canmanagername, CONTEXT_CATEGORY, path)
+            ob, pl_managername, CONTEXT_CATEGORY, path)
         for x in list(manager.keys()):
             del manager[x]
-        for x in list(canmanager.keys()):
-            manager[x] = canmanager[x]
+        for x in list(pl_manager.keys()):
+            manager[x] = pl_manager[x]
 
 
 def renamer(ob, *args, **kw):
