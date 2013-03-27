@@ -10,6 +10,7 @@ from z3c.form import form, field, button
 from plone.z3cform.fieldsets import extensible
 from plone.portlets.constants import CONTEXT_CATEGORY
 
+from plone.multilingual.interfaces import ITranslationManager
 from plone.app.portlets.utils import assignment_mapping_from_key
 
 from Products.CMFCore.utils import getToolByName
@@ -415,8 +416,8 @@ class DuplicaterForm(FormMixin, form.Form):
         target_languages = data.get('target_languages', [])
         use_parent_languages = data.get('use_parent_languages', False)
         if use_parent_languages:
-            parent = Acquisition.aq_parent(context)
-            target_languages = parent.getTranslationLanguages()
+            parent_tm = ITranslationManager(Acquisition.aq_parent(context))
+            target_languages = parent_tm.get_translated_languages()
             msg = u"Translate this object to the parent folder's languages."
         else:
             msg = u"Translate this object to the manually selected languages."

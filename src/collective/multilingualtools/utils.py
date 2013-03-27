@@ -203,8 +203,8 @@ def set_po_description(ob, *args, **kw):
 
 # def can_subtype():
 #     return not ISubtyper is None
-# 
-# 
+#
+#
 # def add_subtype(ob, *args, **kw):
 #     """ sets ob to given subtype """
 #     err = list()
@@ -347,7 +347,7 @@ def cut_and_paste(ob, *args, **kw):
             if Acquisition.aq_parent(trans_object) == ob:
                 name = trans_object.getId()
 
-    
+
     if name is None:
         err.append(u'No translation of the requested object for language '\
             '%s found in %s' % (
@@ -361,7 +361,7 @@ def cut_and_paste(ob, *args, **kw):
     # ob._delObject(name, suppress_events=True)
     # target._setObject(id, trans_object, set_owner=0, suppress_events=True)
     # trans_object = target._getOb(id)
-    # 
+    #
     # notify(ObjectMovedEvent(trans_object, ob, id, target, id))
     # notifyContainerModified(ob)
     # if Acquisition.aq_base(ob) is not Acquisition.aq_base(target):
@@ -404,10 +404,11 @@ def delete_this(ob, *args, **kw):
     if id_to_delete in ob.objectIds():
         name = id_to_delete
     else:
-        # look for translation via getTranslation
+        # look for a translation of the item in the current language
         target_object = kw.get('target_object', None)
         if target_object:
-            trans_object = target_object.getTranslation(lang)
+            manager = ITranslationManager(target_object)
+            trans_object = manager.get_translation(lang)
             if trans_object:
                 name = trans_object.getId()
 
@@ -431,13 +432,13 @@ def translate_this(context, attrs=[], translation_exists=False,
     warnings = list()
     errors = list()
 
-    # Only do this from the canonical
-    context = context.getCanonical()
     # if context is language-neutral, it must receive a language before
     # it is translated
-    if context.Language() == '':
-        context.setLanguage(context.portal_languages.getPreferredLanguage())
-    canLang = context.Language()
+    lang_support = ILanguage(context)
+    manager = ITranslationManager(context)
+    if lang_support.get_language() == '':
+        lang_support.set_language(context.portal_languages.getPreferredLanguage())
+    canLang = lang_support.get_language()
 
     # if the user didn't select target languages, get all supported languages
     # from the language tool
@@ -448,11 +449,11 @@ def translate_this(context, attrs=[], translation_exists=False,
         if lang == canLang:
             continue
         res = list()
-        if not context.hasTranslation(lang):
+        if not manager.get_translation(lang):
             if not translation_exists:
                 # need to make lang a string. It can be unicode so checkid will
                 # freak out and lead to an infinite recursion
-                context.addTranslation(str(lang))
+                manager.add_translation(str(lang))
                 newOb = True
                 if 'title' not in attrs:
                     attrs.append('title')
@@ -467,7 +468,7 @@ def translate_this(context, attrs=[], translation_exists=False,
                     'exists, skipping' % lang)
                 continue
             res.append(u"Found translation for %s " % lang)
-        trans = context.getTranslation(lang)
+        trans = manager.get_translation(lang)
 
         for attr in attrs:
             field = context.getField(attr)
