@@ -46,11 +46,6 @@ class MultilingualToolsView(FormWrapper):
 
     def contents(self):
         z2.switch_on(self, request_layer=self.request_layer)
-        # XXX really messed up hack to support plone.z3cform < 0.5.8
-        # We call every form to make the widgets property available on it,
-        # otherwise view/widgets fails
-        # XXX: FIXME!!!
-        [fi() for fi in self.form_instances]
         return ''.join([fi.render() for fi in self.form_instances])
 
     def render_form(self):
