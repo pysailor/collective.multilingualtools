@@ -6,8 +6,13 @@ import zope.component
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.exceptions import ResourceLockedError
 from Products.Archetypes.utils import shasattr
+from Products.Archetypes.interfaces import IBaseContent, IBaseFolder
 from Products.CMFPlone.utils import safe_unicode
+from collective.multilingualtools.interfaces import IContentHelper
+from collective.multilingualtools import HAS_DEXTERITY
+from zope.interface import implements
 from zope.i18n import translate
+from zope.component import adapts, getUtility
 
 from plone.portlets.interfaces import IPortletManager
 from plone.portlets.interfaces import ILocalPortletAssignmentManager
@@ -24,9 +29,52 @@ from plone.multilingual.interfaces import (
     ITranslatable,
     ITranslationManager)
 
-from Products.Archetypes.interfaces.base import IBaseFolder
+if HAS_DEXTERITY:
+    from plone.dexterity.interfaces import IDexterityFTI
+    from plone.dexterity.interfaces import IDexterityContent
+    from plone.multilingualbehavior.interfaces import ILanguageIndependentField
+else:
+    class IDexterityContent(object):
+        pass
 
 log = logging.getLogger('collective.multilingualtools')
+
+
+class ATContentHelper(object):
+    implements(IContentHelper)
+    adapts(IBaseContent)
+
+    def __init__(self, context):
+        self.context = context
+
+    def get_translatable_fields(self):
+        fields = [
+            x for x in self.context.Schema().fields()
+            if not x.languageIndependent]
+        names = [x.getName() for x in fields if x.getName() != 'id']
+
+        return names
+
+
+class DXContentHelper(object):
+    implements(IContentHelper)
+    adapts(IDexterityContent)
+
+    def __init__(self, context):
+        self.context = context
+
+    def get_translatable_fields(self):
+        names = []
+        fti = getUtility(IDexterityFTI, name=self.context.portal_type)
+        schemas = []
+        schemas.append(fti.lookupSchema())
+        for schema in schemas:
+            for field_name in schema:
+                if not ILanguageIndependentField.providedBy(
+                        schema[field_name]):
+                    names.append(field_name)
+
+        return names
 
 
 def exec_for_all_langs(context, method, *args, **kw):
@@ -418,6 +466,8 @@ def translate_this(
             res.append(u"Found translation for %s " % lang)
         trans = manager.get_translation(lang)
 
+        # XXX Put this into the ATContentHelper and create corresponding
+        # method for DX
         for attr in attrs:
             field = context.getField(attr)
             if not field:

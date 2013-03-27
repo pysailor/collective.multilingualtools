@@ -15,3 +15,12 @@ class IMultilingualForm(Interface):
         """ Helper method used for the linguatools object tab to see if it
             should render
         """
+
+
+class IContentHelper(Interface):
+    """ Methods for working on a content item.
+        The implementation is different for Archetype and Dexterity context.
+    """
+
+    def get_translatable_fields():
+        """ Return all fields that are not language-independent """

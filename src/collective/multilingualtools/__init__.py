@@ -1,4 +1,13 @@
 from zope.i18nmessageid import MessageFactory
+import pkg_resources
+
+try:
+    pkg_resources.get_distribution('plone.dexterity')
+except pkg_resources.DistributionNotFound:
+    HAS_DEXTERITY = False
+else:
+    HAS_DEXTERITY = True
+
 _ = MessageFactory('collective.multilungualtools')
 
 

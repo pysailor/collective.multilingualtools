@@ -1,15 +1,17 @@
-from plone.portlets.interfaces import IPortletManager
+# -*- coding: utf-8 -*-
 
-from zope import component
+from Products.CMFCore.utils import getToolByName
+from Products.Five.utilities.interfaces import IMarkerInterfaces
+from collective.multilingualtools.interfaces import IContentHelper
+from plone.multilingual.interfaces import (
+    ILanguage,
+    ITranslatable)
+from plone.portlets.interfaces import IPortletManager
+from zope.component import getUtilitiesFor
 from zope.schema.interfaces import IVocabularyFactory
 from zope.interface import implements
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
-from Products.CMFCore.utils import getToolByName
-from plone.multilingual.interfaces import (
-    ILanguage,
-    ITranslatable)
-from Products.Five.utilities.interfaces import IMarkerInterfaces
 
 
 class PortletManagerVocabulary(object):
@@ -21,7 +23,7 @@ class PortletManagerVocabulary(object):
         self.context = context
         # look up all portlet managers, but filter oit dashboard stuff
         names = [
-            x[0] for x in component.getUtilitiesFor(IPortletManager)
+            x[0] for x in getUtilitiesFor(IPortletManager)
             if not x[0].startswith('plone.dashboard')]
         terms = [SimpleTerm(x, title=x) for x in names]
 
@@ -37,15 +39,10 @@ class TranslatableFieldsVocabulary(object):
 
     def __call__(self, context):
         self.context = context
-        fields = [
-            x for x in context.Schema().fields()
-            if not x.languageIndependent]
-        # look up all portlet managers, but filter oit dashboard stuff
-        terms = [
-            SimpleTerm(x.getName(), title=x.getName()) for x in fields
-            if x.getName() != 'id']
+        names = IContentHelper(context).get_translatable_fields()
+        return SimpleVocabulary(
+            [SimpleTerm(name, title=name) for name in names])
 
-        return SimpleVocabulary(terms)
 
 TranslatableFieldsVocabularyFactory = TranslatableFieldsVocabulary()
 
