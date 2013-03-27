@@ -31,11 +31,6 @@
         />
 
     <utility
-        component=".vocabularies.SubtypesVocabularyFactory"
-        name="collective.multilingualtools.vocabularies.subtypes"
-        />
-
-    <utility
         component=".vocabularies.TranslatableFieldsVocabularyFactory"
         name="collective.multilingualtools.vocabularies.translatable_fields"
         />
