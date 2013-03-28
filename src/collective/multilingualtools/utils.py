@@ -12,7 +12,7 @@ from collective.multilingualtools.interfaces import IContentHelper
 from collective.multilingualtools import HAS_DEXTERITY
 from zope.interface import implements
 from zope.i18n import translate
-from zope.component import adapts, getUtility
+from zope.component import adapts, getUtility, queryAdapter
 
 from plone.portlets.interfaces import IPortletManager
 from plone.portlets.interfaces import ILocalPortletAssignmentManager
@@ -21,6 +21,9 @@ from OFS.event import ObjectClonedEvent
 
 from plone.app.portlets.utils import assignment_mapping_from_key
 from plone.locking.interfaces import ILockable
+from z3c.relationfield import RelationValue
+from z3c.relationfield.interfaces import IRelationValue
+from zope.app.intid.interfaces import IIntIds
 from zope.event import notify
 from zope.lifecycleevent import ObjectCopiedEvent
 from Products.Five.utilities.interfaces import IMarkerInterfaces
@@ -33,11 +36,13 @@ if HAS_DEXTERITY:
     from plone.dexterity.interfaces import IDexterityFTI
     from plone.dexterity.interfaces import IDexterityContent
     from plone.multilingualbehavior.interfaces import ILanguageIndependentField
+    from plone.dexterity import utils as dexterityutils
 else:
     class IDexterityContent(object):
         pass
 
 log = logging.getLogger('collective.multilingualtools')
+_marker = object()
 
 
 class ATContentHelper(object):
@@ -55,6 +60,47 @@ class ATContentHelper(object):
 
         return names
 
+    def copy_attributes(self, trans, attrs):
+        res = warnings = []
+        for attr in attrs:
+            field = self.context.getField(attr)
+            if not field:
+                warnings.append(
+                    u"Could not find the field '%s'. Please "
+                    "check your spelling" % attr)
+                continue
+            val = field.getAccessor(self.context)()
+            trans.getField(attr).getMutator(trans)(val)
+            res.append(u"  > Transferred attribute '%s'" % attr)
+        # Set the correct format
+        if shasattr(self.context, 'text_format'):
+            trans.setFormat(self.context.text_format)
+        if self.context.portal_type == 'Topic':
+            # copy the contents as well
+            ids = self.context.objectIds()
+            ids.remove('syndication_information')
+
+            # first delete all existing criteria on the translation
+            for existingid in trans.objectIds():
+                if existingid.startswith('crit__'):
+                    trans._delObject(existingid)
+
+            for id in ids:
+                orig_ob = getattr(self.context, id)
+                ob = orig_ob._getCopy(self.context)
+                ob._setId(id)
+                notify(ObjectCopiedEvent(ob, orig_ob))
+
+                trans._setObject(id, ob)
+                ob = trans._getOb(id)
+                ob.wl_clearLocks()
+                ob._postCopy(trans, op=0)
+                ob.manage_afterClone(ob)
+                notify(ObjectClonedEvent(ob))
+
+            res.append(u"  > Transferred collection contents")
+        return dict(res=res, warnings=warnings)
+
 
 class DXContentHelper(object):
     implements(IContentHelper)
@@ -68,6 +114,11 @@ class DXContentHelper(object):
         fti = getUtility(IDexterityFTI, name=self.context.portal_type)
         schemas = []
         schemas.append(fti.lookupSchema())
+        for behavior_schema in dexterityutils.getAdditionalSchemata(
+                self.context, self.context.portal_type):
+            if behavior_schema is not None:
+                schemas.append(behavior_schema)
+
         for schema in schemas:
             for field_name in schema:
                 if not ILanguageIndependentField.providedBy(
@@ -75,6 +126,35 @@ class DXContentHelper(object):
                     names.append(field_name)
 
         return names
+
+    def copy_attributes(self, trans, attrs):
+        res = warnings = []
+        fti = getUtility(IDexterityFTI, name=self.context.portal_type)
+        schemas = []
+        schemas.append(fti.lookupSchema())
+        for behavior_schema in dexterityutils.getAdditionalSchemata(
+                self.context, self.context.portal_type):
+            if behavior_schema is not None:
+                schemas.append(behavior_schema)
+        for schema in schemas:
+            for field_name in schema:
+                if field_name in attrs:
+                    value = getattr(schema(self.context), field_name, _marker)
+                    if IRelationValue.providedBy(value):
+                        obj = value.to_object
+                        adapter = queryAdapter(trans, ILanguage)
+                        trans_obj = ITranslationManager(obj)\
+                            .get_translation(adapter.get_language())
+                        if trans_obj:
+                            intids = getUtility(IIntIds)
+                            value = RelationValue(intids.getId(trans_obj))
+                    if not (value == _marker):
+                        # We check if not (value == _marker) because
+                        # z3c.relationfield has an __eq__
+                        setattr(schema(trans), field_name, value)
+                        res.append(
+                            u"  > Transferred attribute '%s'" % field_name)
+        return dict(res=res, warnings=warnings)
 
 
 def exec_for_all_langs(context, method, *args, **kw):
@@ -440,6 +520,7 @@ def translate_this(
     if not target_languages:
         portal_languages = getToolByName(context, 'portal_languages')
         target_languages = portal_languages.getSupportedLanguages()
+    content_helper = IContentHelper(context)
     for lang in target_languages:
         if lang == canLang:
             continue
@@ -466,45 +547,9 @@ def translate_this(
             res.append(u"Found translation for %s " % lang)
         trans = manager.get_translation(lang)
 
-        # XXX Put this into the ATContentHelper and create corresponding
-        # method for DX
-        for attr in attrs:
-            field = context.getField(attr)
-            if not field:
-                warnings.append(
-                    u"Could not find the field '%s'. Please "
-                    "check your spelling" % attr)
-                continue
-            val = field.getAccessor(context)()
-            trans.getField(attr).getMutator(trans)(val)
-            res.append(u"  > Transferred attribute '%s'" % attr)
-        # Set the correct format
-        if shasattr(context, 'text_format'):
-            trans.setFormat(context.text_format)
-        if context.portal_type == 'Topic':
-            # copy the contents as well
-            ids = context.objectIds()
-            ids.remove('syndication_information')
-
-            # first delete all existing criteria on the translation
-            for existingid in trans.objectIds():
-                if existingid.startswith('crit__'):
-                    trans._delObject(existingid)
-
-            for id in ids:
-                orig_ob = getattr(context, id)
-                ob = orig_ob._getCopy(context)
-                ob._setId(id)
-                notify(ObjectCopiedEvent(ob, orig_ob))
-
-                trans._setObject(id, ob)
-                ob = trans._getOb(id)
-                ob.wl_clearLocks()
-                ob._postCopy(trans, op=0)
-                ob.manage_afterClone(ob)
-                notify(ObjectClonedEvent(ob))
-
-            res.append(u"  > Transferred collection contents")
+        content_results = content_helper.copy_attributes(trans, attrs)
+        res.extend(content_results['res'])
+        warnings.extend(content_results['warnings'])
         info.append(u"\n".join(res))
     return (info, warnings, errors)
 
