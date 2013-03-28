@@ -143,11 +143,12 @@ class DXContentHelper(object):
                     if IRelationValue.providedBy(value):
                         obj = value.to_object
                         adapter = queryAdapter(trans, ILanguage)
-                        trans_obj = ITranslationManager(obj)\
-                            .get_translation(adapter.get_language())
-                        if trans_obj:
-                            intids = getUtility(IIntIds)
-                            value = RelationValue(intids.getId(trans_obj))
+                        if ITranslatable.providedBy(obj):
+                            trans_obj = ITranslationManager(obj)\
+                                .get_translation(adapter.get_language())
+                            if trans_obj:
+                                intids = getUtility(IIntIds)
+                                value = RelationValue(intids.getId(trans_obj))
                     if not (value == _marker):
                         # We check if not (value == _marker) because
                         # z3c.relationfield has an __eq__
