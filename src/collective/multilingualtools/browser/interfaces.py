@@ -174,7 +174,7 @@ class IDuplicaterSchema(interface.Interface):
         title=_("title_translation_exists", default=u"Translation exists"),
         description=_(
             "description_translation_exists", default=u"Tick this box if a "
-            u"translation alreay exits and you just want to propagate "
+            u"translation already exits and you just want to propagate "
             u"attributes or Collection criteria"),
         required=False,
     )
