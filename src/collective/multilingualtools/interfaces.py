@@ -23,4 +23,13 @@ class IContentHelper(Interface):
     """
 
     def get_translatable_fields():
-        """ Return all fields that are not language-independent """
+        """ Returns all fields that are not language-independent """
+
+    def check_for_title_attr(attrs):
+        """ Makes sure the title attribute is present in the given list
+            of attrs """
+
+    def copy_attributes(trans, attrs):
+        """ Copy the values of all given attributes from the source to the
+            translation.
+        """

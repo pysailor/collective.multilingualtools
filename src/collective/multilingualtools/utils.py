@@ -63,6 +63,11 @@ class ATContentHelper(object):
                 field_info.append((name, name))
         return field_info
 
+    def check_for_title_attr(self, attrs):
+        if "title" not in attrs:
+            attrs.append("title")
+        return attrs
+
     def copy_attributes(self, trans, attrs):
         res = []
         warnings = []
@@ -132,6 +137,13 @@ class DXContentHelper(object):
                     ))
 
         return field_info
+
+    def check_for_title_attr(self, attrs):
+        for attr in attrs:
+            if attr.startswith('title|'):
+                return attrs
+        attrs.append('title|')
+        return attrs
 
     def copy_attributes(self, trans, attrs):
         res = []
@@ -542,6 +554,8 @@ def translate_this(
                 # freak out and lead to an infinite recursion
                 manager.add_translation(str(lang))
                 res.append("Added Translation for %s" % lang)
+                # For a new translation, make sure the title is copied as well
+                attrs = content_helper.check_for_title_attr(attrs)
             else:
                 warnings.append(
                     u'Translation in language %s does not exist, '
