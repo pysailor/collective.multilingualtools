@@ -53,6 +53,8 @@ class ATContentHelper(object):
 
     def __init__(self, context):
         self.context = context
+        self.language = self.context.Language()
+        self.fallbacks = [self.language.split('-')[0]]
 
     def get_translatable_fields(self):
         field_info = []
@@ -61,8 +63,30 @@ class ATContentHelper(object):
             if not x.languageIndependent]
         for field in fields:
             name = field.getName()
-            if name not in ('id', 'language'):
-                field_info.append((name, name))
+            if name in ('id', 'language'):
+                continue
+            widget = getattr(field, 'widget', None)
+            if widget:
+                label = getattr(widget, 'label', '')
+                msgid = getattr(widget, 'label_msgid', None)
+                if msgid:
+                    domain = getattr(widget, 'i18n_domain', 'plone')
+                    label = Message(msgid, domain=domain, default=label)
+                if not label:
+                    label = name
+                if isinstance(label, Message):
+                    trans_util = queryUtility(ITranslationDomain, label.domain)
+                    if trans_util:
+                        trans_util.setLanguageFallbacks(self.fallbacks)
+                        label = trans_util.translate(
+                            label, self.language)
+                    else:
+                        label = translate(label, self.language)
+            if getattr(field, 'required', False):
+                label = "%s (%s) (*)" % (label, name)
+            else:
+                label = "%s (%s)" % (label, name)
+            field_info.append((name, label))
         return field_info
 
     def check_for_title_attr(self, attrs):
@@ -151,7 +175,9 @@ class DXContentHelper(object):
                             title = translate(title, self.language)
                     # Mark required fields
                     if getattr(field, 'required', False):
-                        title = "%s (*)" % title
+                        title = "%s (%s) (*)" % (title, field_name)
+                    else:
+                        title = "%s (%s)" % (title, field_name)
                     field_info.append((
                         "%s|%s" % (field_name, schema.__identifier__),
                         title,
