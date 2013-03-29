@@ -10,8 +10,7 @@ from Products.Archetypes.interfaces import IBaseContent, IBaseFolder
 from Products.CMFPlone.utils import safe_unicode
 from collective.multilingualtools.interfaces import IContentHelper
 from collective.multilingualtools import HAS_DEXTERITY
-from zope.interface import implements
-from zope.i18n import translate
+
 from zope.component import adapts, getUtility, queryUtility, queryAdapter
 from plone.behavior.interfaces import IBehavior
 from plone.portlets.interfaces import IPortletManager
@@ -25,6 +24,10 @@ from z3c.relationfield import RelationValue
 from z3c.relationfield.interfaces import IRelationValue
 from zope.app.intid.interfaces import IIntIds
 from zope.event import notify
+from zope.i18n import translate
+from zope.i18n.interfaces import ITranslationDomain
+from zope.interface import implements
+from zope.i18nmessageid import Message
 from zope.lifecycleevent import ObjectCopiedEvent
 from Products.Five.utilities.interfaces import IMarkerInterfaces
 from plone.multilingual.interfaces import (
@@ -117,6 +120,8 @@ class DXContentHelper(object):
 
     def __init__(self, context):
         self.context = context
+        self.language = ILanguage(self.context).get_language()
+        self.fallbacks = [self.language.split('-')[0]]
 
     def get_translatable_fields(self):
         field_info = []
@@ -129,11 +134,28 @@ class DXContentHelper(object):
                 schemas.append(behavior_schema)
         for schema in schemas:
             for field_name in schema:
-                if not ILanguageIndependentField.providedBy(
-                        schema[field_name]) and field_name != 'language':
+                field = schema[field_name]
+                if not ILanguageIndependentField.providedBy(field) \
+                        and field_name != 'language':
+                    title = field.title
+                    # If the field's title is a translatable Message, get
+                    # the correct translation for it. Use fallback in case
+                    # we have a combined language code such as da-dk
+                    if isinstance(title, Message):
+                        trans_util = queryUtility(
+                            ITranslationDomain, title.domain)
+                        if trans_util:
+                            trans_util.setLanguageFallbacks(self.fallbacks)
+                            title = trans_util.translate(
+                                title, self.language)
+                        else:
+                            title = translate(title, self.language)
+                    # Mark required fields
+                    if getattr(field, 'required', False):
+                        title = "%s (*)" % title
                     field_info.append((
                         "%s|%s" % (field_name, schema.__identifier__),
-                        field_name,
+                        title,
                     ))
 
         return field_info
