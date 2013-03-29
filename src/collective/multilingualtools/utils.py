@@ -11,7 +11,8 @@ from Products.CMFPlone.utils import safe_unicode
 from collective.multilingualtools.interfaces import IContentHelper
 from collective.multilingualtools import HAS_DEXTERITY
 
-from zope.component import adapts, getUtility, queryUtility, queryAdapter
+from zope.component import (
+    adapts, getUtility, queryUtility, queryAdapter, getMultiAdapter)
 from plone.behavior.interfaces import IBehavior
 from plone.portlets.interfaces import IPortletManager
 from plone.portlets.interfaces import ILocalPortletAssignmentManager
@@ -31,9 +32,7 @@ from zope.i18nmessageid import Message
 from zope.lifecycleevent import ObjectCopiedEvent
 from Products.Five.utilities.interfaces import IMarkerInterfaces
 from plone.multilingual.interfaces import (
-    ILanguage,
-    ITranslatable,
-    ITranslationManager)
+    ILanguage, ITranslatable, ITranslationManager)
 
 if HAS_DEXTERITY:
     from plone.dexterity.interfaces import IDexterityFTI
@@ -281,9 +280,8 @@ def block_portlets(ob, *args, **kw):
     pl_managers = kw['managers']
     blockstatus = kw['blockstatus']
     for pl_managername, pl_manager in pl_managers.items():
-        portletManager = zope.component.getUtility(
-            IPortletManager, name=pl_managername)
-        assignable = zope.component.getMultiAdapter(
+        portletManager = getUtility(IPortletManager, name=pl_managername)
+        assignable = getMultiAdapter(
             (ob, portletManager, ), ILocalPortletAssignmentManager)
         assignable.setBlacklistStatus(CONTEXT_CATEGORY, blockstatus)
 
