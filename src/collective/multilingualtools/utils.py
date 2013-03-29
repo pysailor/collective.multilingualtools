@@ -12,8 +12,8 @@ from collective.multilingualtools.interfaces import IContentHelper
 from collective.multilingualtools import HAS_DEXTERITY
 from zope.interface import implements
 from zope.i18n import translate
-from zope.component import adapts, getUtility, queryAdapter
-
+from zope.component import adapts, getUtility, queryUtility, queryAdapter
+from plone.behavior.interfaces import IBehavior
 from plone.portlets.interfaces import IPortletManager
 from plone.portlets.interfaces import ILocalPortletAssignmentManager
 from plone.portlets.constants import CONTEXT_CATEGORY
@@ -53,15 +53,19 @@ class ATContentHelper(object):
         self.context = context
 
     def get_translatable_fields(self):
+        field_info = []
         fields = [
             x for x in self.context.Schema().fields()
             if not x.languageIndependent]
-        names = [x.getName() for x in fields if x.getName() != 'id']
-
-        return names
+        for field in fields:
+            name = field.getName()
+            if name not in ('id', 'language'):
+                field_info.append((name, name))
+        return field_info
 
     def copy_attributes(self, trans, attrs):
-        res = warnings = []
+        res = []
+        warnings = []
         for attr in attrs:
             field = self.context.getField(attr)
             if not field:
@@ -110,7 +114,7 @@ class DXContentHelper(object):
         self.context = context
 
     def get_translatable_fields(self):
-        names = []
+        field_info = []
         fti = getUtility(IDexterityFTI, name=self.context.portal_type)
         schemas = []
         schemas.append(fti.lookupSchema())
@@ -118,43 +122,49 @@ class DXContentHelper(object):
                 self.context, self.context.portal_type):
             if behavior_schema is not None:
                 schemas.append(behavior_schema)
-
         for schema in schemas:
             for field_name in schema:
                 if not ILanguageIndependentField.providedBy(
-                        schema[field_name]):
-                    names.append(field_name)
+                        schema[field_name]) and field_name != 'language':
+                    field_info.append((
+                        "%s|%s" % (field_name, schema.__identifier__),
+                        field_name,
+                    ))
 
-        return names
+        return field_info
 
     def copy_attributes(self, trans, attrs):
-        res = warnings = []
-        fti = getUtility(IDexterityFTI, name=self.context.portal_type)
-        schemas = []
-        schemas.append(fti.lookupSchema())
-        for behavior_schema in dexterityutils.getAdditionalSchemata(
-                self.context, self.context.portal_type):
-            if behavior_schema is not None:
-                schemas.append(behavior_schema)
-        for schema in schemas:
-            for field_name in schema:
-                if field_name in attrs:
-                    value = getattr(schema(self.context), field_name, _marker)
-                    if IRelationValue.providedBy(value):
-                        obj = value.to_object
-                        adapter = queryAdapter(trans, ILanguage)
-                        if ITranslatable.providedBy(obj):
-                            trans_obj = ITranslationManager(obj)\
-                                .get_translation(adapter.get_language())
-                            if trans_obj:
-                                intids = getUtility(IIntIds)
-                                value = RelationValue(intids.getId(trans_obj))
-                    if not (value == _marker):
-                        # We check if not (value == _marker) because
-                        # z3c.relationfield has an __eq__
-                        setattr(schema(trans), field_name, value)
-                        res.append(
-                            u"  > Transferred attribute '%s'" % field_name)
+        res = []
+        warnings = []
+        for attr in attrs:
+            field_name, behavior_name = attr.split('|')
+            behavior_interface = None
+            behavior_instance = queryUtility(IBehavior, name=behavior_name)
+            if behavior_instance is not None:
+                behavior_interface = behavior_instance.interface
+            if behavior_interface is not None:
+                value = getattr(
+                    behavior_interface(self.context), field_name, _marker)
+            else:
+                value = getattr(self.context, field_name, _marker)
+            if IRelationValue.providedBy(value):
+                obj = value.to_object
+                adapter = queryAdapter(trans, ILanguage)
+                if ITranslatable.providedBy(obj):
+                    trans_obj = ITranslationManager(obj)\
+                        .get_translation(adapter.get_language())
+                    if trans_obj:
+                        intids = getUtility(IIntIds)
+                        value = RelationValue(intids.getId(trans_obj))
+            if not (value == _marker):
+                # We check if not (value == _marker) because
+                # z3c.relationfield has an __eq__
+                if behavior_interface is not None:
+                    setattr(behavior_interface(trans), field_name, value)
+                else:
+                    setattr(trans, field_name, value)
+                res.append(
+                    u"  > Transferred attribute '%s'" % field_name)
         return dict(res=res, warnings=warnings)
 
 
@@ -531,8 +541,6 @@ def translate_this(
                 # need to make lang a string. It can be unicode so checkid will
                 # freak out and lead to an infinite recursion
                 manager.add_translation(str(lang))
-                if 'title' not in attrs:
-                    attrs.append('title')
                 res.append("Added Translation for %s" % lang)
             else:
                 warnings.append(
@@ -547,7 +555,6 @@ def translate_this(
                 continue
             res.append(u"Found translation for %s " % lang)
         trans = manager.get_translation(lang)
-
         content_results = content_helper.copy_attributes(trans, attrs)
         res.extend(content_results['res'])
         warnings.extend(content_results['warnings'])

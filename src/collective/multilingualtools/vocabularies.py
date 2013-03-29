@@ -39,9 +39,9 @@ class TranslatableFieldsVocabulary(object):
 
     def __call__(self, context):
         self.context = context
-        names = IContentHelper(context).get_translatable_fields()
+        field_info = IContentHelper(context).get_translatable_fields()
         return SimpleVocabulary(
-            [SimpleTerm(name, title=name) for name in names])
+            [SimpleTerm(info[0], title=info[1]) for info in field_info])
 
 
 TranslatableFieldsVocabularyFactory = TranslatableFieldsVocabulary()
