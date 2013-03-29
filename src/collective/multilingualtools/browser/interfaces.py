@@ -11,7 +11,7 @@ class INamingSchema(interface.Interface):
         description=_(
             "description_text", default=u"Type some text. This text will then "
             u"be written on all translations as Title or Description, "
-            u"depending on your further choices in this form."),
+            u"depending on which of the two buttons you click."),
         required=True,
     )
 
@@ -19,8 +19,8 @@ class INamingSchema(interface.Interface):
         title=_("title_po_domain", default=u"PO Domain"),
         description=_(
             "description_po_domain", default=u"Give a po domain here, if you "
-            u"have typed a message id in the field above. The translation for "
-            u"this domain of the message you have typed will then be written "
+            u"have typed a message id in the field above. The translation in "
+            u"this po-domain of the text you have typed will then be written "
             u"as Title / Description. If you leave the domain empty or state a"
             u"non-existing one, the text above will be written verbatim."),
         default=u"plone",

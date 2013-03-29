@@ -56,7 +56,7 @@ class FormMixin(extensible.ExtensibleForm):
 
 class NamingForm(FormMixin, form.Form):
     """ """
-    label = u"Naming"
+    label = _("label_naming_form", default=u"Title / Description")
     ignoreContext = True
     fields = field.Fields(
         interfaces.INamingSchema).select('text', 'po_domain',)
@@ -111,9 +111,10 @@ class NamingForm(FormMixin, form.Form):
 
 class RenamingForm(FormMixin, form.Form):
     """ Renaming """
-    label = u"Rename"
-    description = u"Rename an object with current id in this folder to the "\
-        "new id."
+    label = _("label_renaming_form", default=u"Rename")
+    description = _(
+        "description_renaming_form", default=u"Rename an object inside the "
+        u"current folder and all translations from old to new id (short name)")
     ignoreContext = True
 
     fields = field.Fields(
@@ -184,9 +185,10 @@ class CutAndPasteForm(FormMixin, form.Form):
 
 class PortletForm(FormMixin, form.Form):
     """ """
-    label = u"Portlets"
-    description = u"Propagate the portlets set on the current " \
-        u"object to all translations, or change the block status"
+    label = _(u"label_portlet_form", default=u"Portlets")
+    description = _(
+        "description_portlet_form", default=u"Propagate the portlets set on "
+        u"the current object to all translations, or change the block status")
     ignoreContext = True
     fields = field.Fields(
         interfaces.IPortletSchema).select('portlet_manager', 'blockstatus',)
@@ -269,8 +271,10 @@ class PortletForm(FormMixin, form.Form):
 
 class ReindexForm(FormMixin, form.Form):
     """ """
-    label = u"Reindex"
-    description = u"Reindex this object and all its translations."
+    label = _("label_reindex_form", default=u"Reindex")
+    description = _(
+        "description_reindex_form", default=u"Reindex this object and all its "
+        u"translations.")
     buttons = button.Buttons(
         interfaces.IReindexSchema).select('reindex_all',)
 
@@ -291,9 +295,10 @@ class ReindexForm(FormMixin, form.Form):
 
 class WokflowForm(FormMixin, form.Form):
     """ """
-    label = u"Workflow"
-    description = u"Change the workflow of this object and all of its " \
-        "translations."
+    label = _("label_workflow_form", default=u"Workflow")
+    description = _(
+        "description_workflow_form", default=u"Change the workflow state of "
+        u"this object and all of its translations.")
     ignoreContext = True
 
     fields = field.Fields(
@@ -322,11 +327,12 @@ class WokflowForm(FormMixin, form.Form):
 
 class DuplicaterForm(FormMixin, form.Form):
     """ Duplicate current object into all languages"""
-    label = u"Copy (duplicate) this object"
-    description = u"Create a copy of the current object in the "\
-            u"selected languages. Collection criteria are copied as well. "\
-            u"This function can be used to create stub objects in the desired"\
-            u" languages to be worked on at a later stage."
+    label = _("label_duplicater_form", default=u"Copy (duplicate) this object")
+    description = _(
+        "description_duplicater_form", default=u"Create a copy of the current "
+        u"object in the selected languages. Collection criteria are copied as "
+        u"well. This function can be used to create stub translations in the "
+        u"desired languages to be worked on at a later stage.")
     ignoreContext = True
 
     buttons = button.Buttons(interfaces.IDuplicaterSchema).select(
@@ -363,7 +369,7 @@ class DuplicaterForm(FormMixin, form.Form):
 
 class DeleterForm(FormMixin, form.Form):
     """ """
-    label = u"Deleter"
+    label = _("label_deleter_form", default=u"Deleter")
     ignoreContext = True
     fields = field.Fields(
         interfaces.IObjectHandlingSchema).select('id_to_delete',)
@@ -391,7 +397,7 @@ class DeleterForm(FormMixin, form.Form):
 
 class PropertyForm(FormMixin, form.Form):
     """ """
-    label = u"Properties"
+    label = _("label_property_form", default=u"Properties")
     ignoreContext = True
     fields = field.Fields(
         interfaces.IPropertySchema).select(
@@ -449,7 +455,7 @@ class PropertyForm(FormMixin, form.Form):
 
 class MarkerInterfaceForm(FormMixin, form.Form):
     """ """
-    label = u"Marker Interfaces"
+    label = _("label_marker_interface_form", u"Marker Interfaces")
     description = u"Set or remove marker interfaces on this object and all " \
         "of its translations."
     ignoreContext = True
