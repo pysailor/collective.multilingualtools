@@ -134,9 +134,10 @@ class IDuplicaterSchema(interface.Interface):
     attributes_to_copy = schema.List(
         title=_("title_attributes_to_copy", default=u'Attributes to copy'),
         description=_(
-            "description_attributes_to_copy", default=u'Select one or more '
-            u'attributes to have their values copied over to the '
-            u'translations.'),
+            "description_attributes_to_copy", default=u"Select one or more "
+            u"attributes to have their values copied over to the "
+            u"translations. Attributes that are required on this content type "
+            u"are marked with an asterisk, but you don't need to select them."),
         default=list(),
         required=False,
         value_type=schema.Choice(

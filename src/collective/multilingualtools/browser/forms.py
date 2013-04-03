@@ -330,9 +330,9 @@ class DuplicaterForm(FormMixin, form.Form):
     label = _("label_duplicater_form", default=u"Copy (duplicate) this object")
     description = _(
         "description_duplicater_form", default=u"Create a copy of the current "
-        u"object in the selected languages. Collection criteria are copied as "
-        u"well. This function can be used to create stub translations in the "
-        u"desired languages to be worked on at a later stage.")
+        u"object in the selected languages. This function can be used to "
+        u"create stub translations in the desired languages to be worked on "
+        u"at a later time.")
     ignoreContext = True
 
     buttons = button.Buttons(interfaces.IDuplicaterSchema).select(
