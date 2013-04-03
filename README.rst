@@ -1,7 +1,8 @@
 collective.multilingualtools
 ============================
 
-This package is WORK IN PROGRESS. It is based on the concepts of slc.linguatools,
+This package is WORK IN PROGRESS. It is based on the concepts of
+collective/slc.linguatools,
 but this package works with plone.app.multilingual and both dexterity and archetypes.
 
 It aims to offer a handfull of utilities for performing the same action on all
